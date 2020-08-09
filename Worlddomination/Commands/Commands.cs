@@ -51,10 +51,7 @@ namespace Worlddomination.Commands
             await Context.Channel.SendMessageAsync(embed: embedded);
         }
 
-        /* IDEAS:
-         * -links
-         * -6dof
-         */
+
 
         public static string[] memefileNames;
 
@@ -62,12 +59,6 @@ namespace Worlddomination.Commands
         [Summary("returns a meme")]
         public async Task returnMeme()
         {
-            // open meme directory
-            // first load ? 
-            //  yes -> populate filenames
-            // 
-            // get random file, 
-            // check if it has been used before <- we are not doing this for a while
             try
             {
                 if (Directory.Exists(Data.Paths.meme_directory))
@@ -233,7 +224,6 @@ namespace Worlddomination.Commands
                 Title = "version " + Program.version,
             };
             embed.WithColor(Color.Blue);
-            // embed.WithCurrentTimestamp();
             Discord.Embed embedded = embed.Build();
 
             await Context.Channel.SendMessageAsync(embed: embedded);
@@ -385,9 +375,7 @@ namespace Worlddomination.Commands
             if ((Context.Message.Author.Username + "#" + Context.Message.Author.Discriminator).Equals("luponix#5950"))
             {
                 await Context.Channel.SendMessageAsync("Processing...");
-                //you really trust them that they give a valid instance, you fool. the crash you are likely looking at could have been prevented
-                //by inserting a simple if statement instead of writing this comment. do you have selfdestructive tendencies
-                //or does this amuse you so much that you keep this up
+
                 Program.smh.instances[instance].PrintChannelNames(Context.Guild.Name,Context.Message.Channel.Name);              
             }
             else
@@ -396,204 +384,7 @@ namespace Worlddomination.Commands
             }
         }
 
-        /*
-        [Command("upload")]
-        [Summary("saves channel and guild id to Broadcast")]
-        public async Task RegisterChannelId()
-        {
-            if ((Context.Message.Author.Username+"#"+Context.Message.Author.Discriminator).Equals("luponix#5950"))
-            {
-                /*
-                ulong c_id = Context.Channel.Id;
-                ulong g_id = Context.Guild.Id;
-                string c_name = Context.Channel.Name;
-                string g_name = Context.Guild.Name;
-                Data.Gate.SaveBroadcastLocations(c_id.ToString());
-                Data.Gate.SaveBroadcastLocations(g_id.ToString());
-                await Context.Channel.SendMessageAsync("Success: g-"+g_name+"| c-"+c_name); 
-                Console.WriteLine("Received Upload request");
-                Imgur.Imgur imgur = new Imgur.Imgur();
-                
-                 //   https://icatcare.org/app/uploads/2018/07/Thinking-of-getting-a-cat.png
-                string upload = imgur.GetImageUrl(@"C:\Users\luponix\Desktop\[TOHA HEAVY INDUSTRIES]\imgurTest.png");
-                await Context.Channel.SendMessageAsync(upload);
-
-            }
-            else
-            {
-                await Context.Channel.SendMessageAsync((Context.Message.Author.Username + "#" + Context.Message.Author.Discriminator));
-            }//491757
-        }*/
-
-
-/*
-        [Command("purge")]
-        public async Task purge(int num_messages)
-        {
-            if (num_messages > 0)
-            {
-                var messages = await Context.Channel.GetMessagesAsync(num_messages).FlattenAsync();
-                await (Context.Channel as SocketTextChannel).DeleteMessagesAsync(messages);
-            }
-            else
-            if (num_messages <= 0)
-            {
-                await Context.Channel.SendMessageAsync("0 and negative numbers won't work with this command!");
-            }
-            else
-            {
-                await Context.Channel.SendMessageAsync("In order for this command to work, enter the number of messages to be deleted after the command!");
-            }
-
-        }
-
-        [Command("delete")]
-        public async Task dl(int num_messages)
-        {
-            var messages = await Context.Channel.GetMessagesAsync(num_messages).FlattenAsync();
-            foreach( var a in messages )
-            {
-                await a.DeleteAsync();
-            }
-           // await (Context.Channel as SocketTextChannel).DeleteMessagesAsync(messages);
-        }
-
-        */
-
-
-
-
-
-
-
-
-        /*
-        [Command("purge", RunMode = RunMode.Async)]
-        [Summary("Deletes the specified amount of messages.")]
-        [RequireUserPermission(GuildPermission.Administrator)]
-        [RequireBotPermission(ChannelPermission.ManageMessages)]
-        public async Task PurgeChat(uint amount)
-        {
-            var messages = Context.Channel.GetMessagesAsync((int)amount + 1).Flatten().Result();
-
-            foreach( ulong id in messages.)
-            {
-
-            }
-
-            await this.Context.Channel.DeleteMessageAsync(messages);
-            const int delay = 5000;
-            var m = await this.ReplyAsync($"Purge completed. _This message will be deleted in {delay / 1000} seconds._");
-            await Task.Delay(delay);
-            await m.DeleteAsync();
-        }*/
-
-        /*
-     [Command("purge")]
-     [Name("purge <amount>")]
-     [Summary("Deletes a specified amount of messages")]
-     //[RequireBotPermission(GuildPermission.ManageMessages)]
-     //[RequireUserPermission(GuildPermission.ManageMessages)]
-     public async Task DelMesAsync(int delnum)
-     {
-         if ((Context.Message.Author.Username + "#" + Context.Message.Author.Discriminator).Equals("luponix#5950"))
-         {
-             IEnumerable<IMessage> items = await Context.Channel.GetMessagesAsync(delnum + 1).FlattenAsync();
-             int counter = 0;
-             foreach (var i in items)
-             {
-                 counter++;
-                 await Context.Channel.DeleteMessageAsync(i.Id);
-             }
-
-             await Context.Channel.SendMessageAsync("Deleted " + counter + " messages");
-         }
-         else
-         {
-             await Context.Channel.SendMessageAsync((Context.Message.Author.Username + "#" + Context.Message.Author.Discriminator));
-         }
-     }*/
-
-        /*
-                [Command("clearchannel")]
-                [Summary("Delete all messages in channel.")]
-                public async Task ClearChannelAsync([Remainder] string messageString = null)
-                {
-                   // MiscModule.SetContext(Context);
-
-
-
-                    int hours = 0;
-                    int mins = 0;
-                    int secs = 0;
-
-                    if (!String.IsNullOrEmpty(messageString))
-                    {
-                        bool error = false;
-                        try
-                        {
-
-                            foreach (string parm in messageString.Split(" ".ToCharArray()))
-                            {
-                                if (parm.ToLower().EndsWith("h")) hours = Convert.ToInt32(parm.Substring(0, parm.Length - 1));
-                                if (parm.ToLower().EndsWith("m")) mins = Convert.ToInt32(parm.Substring(0, parm.Length - 1));
-                                if (parm.ToLower().EndsWith("s")) secs = Convert.ToInt32(parm.Substring(0, parm.Length - 1));
-                            }
-                        }
-                        catch
-                        {
-                            error = true;
-                        }
-
-                        if (error) return;
-                    }
-
-                    IEnumerable<IMessage> all = await Context.Channel.GetMessagesAsync(9999).FlattenAsync();
-                    IEnumerable<IMessage> delete = all.Where(x => (DateTime.Now - x.Timestamp) > new TimeSpan(hours, mins, secs));
-
-                    int count = delete.Count();
-                    if (count > 0) await ((ITextChannel)Context.Channel).DeleteMessagesAsync(delete);
-
-                    await Task.Delay(200);
-                    await ((ITextChannel)Context.Channel).DeleteMessageAsync(Context.Message);
-
-                    IUserMessage m = await ReplyAsync($"Deleted {count} messages. This message will selfdestruct right now.");
-                    await Task.Delay(1000);
-                    await m.DeleteAsync();
-                }*/
-
-
-
-
-
-
-        /*
-        [Command("GetStreams")]
-        [Summary("hopefully sends an API request for a game id")]
-        public async Task GetStreams()
-        {
-            if ((Context.Message.Author.Username + "#" + Context.Message.Author.Discriminator).Equals("luponix#5950"))
-            {
-                ApiRequests.RequestHandler ApiRequestHandler = new ApiRequests.RequestHandler();
-                
-                string result = await ApiRequestHandler.GetStreamsForGameIdsAsync();
-
-                await Context.Channel.SendMessageAsync(result);
-
-            }
-            else
-            {
-                await Context.Channel.SendMessageAsync((Context.Message.Author.Username + "#" + Context.Message.Author.Discriminator));
-            }//491757
-        }*/
-
-
-
-        // add command to get guild id and channel id as broadcast targets
-
-        // add command to add streamers to track
-
-        // add command to create a minesweeper field
+       
 
     }
 }

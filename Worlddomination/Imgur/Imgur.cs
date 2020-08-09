@@ -15,10 +15,6 @@ namespace Worlddomination.Imgur
     public class Imgur
     {
         
-
-
-        public string UploadedImageUrl = ""; //might not be needed
-
         public Imgur()
         {
 
@@ -42,7 +38,6 @@ namespace Worlddomination.Imgur
                     image = await endpoint.UploadImageStreamAsync(fs);
                 }
                // Console.WriteLine("Image uploaded. Image Url: " + image.Link);
-                UploadedImageUrl = image.Link;
                 return image.Link;
             }
             catch (ImgurException imgurEx)

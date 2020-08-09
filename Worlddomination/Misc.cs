@@ -8,7 +8,6 @@ namespace Worlddomination
 {
     class Misc
     {
-       //test
 
         internal static void SendMessageWithoutContext( string message, string channelName, string guildName = null)
         {
@@ -44,10 +43,6 @@ namespace Worlddomination
 
         }
 
-
-
-
-      //  curl -H 'Client-ID: SOMECLIENT' \
-      //       -X GET 'https://api.twitch.tv/helix/users?login=AndreMatosdeSousa'
+     
     }
 }
