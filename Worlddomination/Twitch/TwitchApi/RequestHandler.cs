@@ -26,9 +26,9 @@ namespace Worlddomination.Twitch.TwitchApi
             try
             {
                 TwitchAPI API = new TwitchAPI();
-                API.Settings.ClientId = "onn9jpsat3vqo6muefbfgcq9m0wl26";
-                API.Settings.Secret = "212b473uo803kull6iw707sq37cmzo";
-                API.Settings.AccessToken = "uujpqfrp1c6vc4s0pg7ypemefg7adg";
+                API.Settings.ClientId = Data.APIToken.GetTwitchClientId(); 
+                API.Settings.Secret = Data.APIToken.GetTwitchClientSecret();
+                API.Settings.AccessToken = Data.APIToken.GetTwitchAccessToken();
 
                 List<string> gameIds = new List<string>();
                 gameIds.Add(gameid);
@@ -72,9 +72,9 @@ namespace Worlddomination.Twitch.TwitchApi
             try
             {
                 TwitchAPI API = new TwitchAPI();
-                API.Settings.ClientId = "onn9jpsat3vqo6muefbfgcq9m0wl26";
-                API.Settings.Secret = "212b473uo803kull6iw707sq37cmzo";
-                API.Settings.AccessToken = "uujpqfrp1c6vc4s0pg7ypemefg7adg";
+                API.Settings.ClientId = Data.APIToken.GetTwitchClientId();
+                API.Settings.Secret = Data.APIToken.GetTwitchClientSecret();
+                API.Settings.AccessToken = Data.APIToken.GetTwitchAccessToken();
 
 
                 GetUsersResponse v = await API.Helix.Users.GetUsersAsync(ids: ids);
