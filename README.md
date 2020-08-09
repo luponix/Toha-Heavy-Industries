@@ -50,6 +50,7 @@ Classes:
     
     
   To-do:
+   Fix this readme file since md apparently doesnt use spaces the way god intended
    Imgur.Download.cs nearly obsolete, discord supports just uploading the file directly, lets skip the imgur part once the keys run out
    Imgur.Imgur.cs -||-
    Data.APIToken.cs populate this from a file to make this bot reusable without the need for recompiling
