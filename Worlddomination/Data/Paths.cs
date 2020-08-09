@@ -13,8 +13,9 @@ namespace Worlddomination.Data
 
         public static string img_directory = @"E:\TohaHeavyIndustries Images Archive";
 
-        public static string meme_directory = @"C:\Users\luponix\Desktop\approved memes";
+        public static string meme_directory = @"C:\Users\luponix\Desktop\Ausgelagert\approved memes";
 
+        // also load the tokens from a file to make this runnable under all circumstances without needing to recompile
 
         public static void Initialise()
         {

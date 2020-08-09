@@ -18,48 +18,42 @@ namespace Worlddomination
 
             => new Program().MainAsync(args).GetAwaiter().GetResult();
         public static DiscordSocketClient _client;
-        public static TwitchAPI API ;
+        public static TwitchAPI API;
+
         public static StreamsMonitorHandler smh = new StreamsMonitorHandler();
+
         public static string version = "0.8.2";
 
         internal static CommandService commands;
         internal static IServiceProvider services;
-        //public static bool silent_on_streamstart_event = true;
+
         
 
 
         public async Task MainAsync(string[] args)
         {
-            //this handles the commandline arguments
-            foreach( string command_argument in args)
-            {
-                Console.WriteLine(command_argument);
-                //if (command_argument.Equals("-notsilent")) silent_on_streamstart_event = false;
-            }
-            //Console.WriteLine(DateTime.Now.ToString("HH:mm:ss")+" Control     silent_on_streamstart_event is set to " +silent_on_streamstart_event);
-            //Twitch.SilentTimer st = new Twitch.SilentTimer(180000);
+
 
             Data.Paths.Initialise();
-            Console.WriteLine(" Initialised Paths");
+            Console.WriteLine("Initialised Paths");
 
-            //initialise Discord
+            // initialise Discord
             _client = new DiscordSocketClient();
             _client.Log += Log;
 
+            // public twitch api object
             API = new TwitchAPI();
-            API.Settings.ClientId = Data.APIToken.GetTwitchClientId();          //Twitch API ClientID
-            API.Settings.Secret = Data.APIToken.GetTwitchClientSecret();            //Twitch APi Client_Secret
+            API.Settings.ClientId = Data.APIToken.GetTwitchClientId();          
+            API.Settings.Secret = Data.APIToken.GetTwitchClientSecret();           
             API.Settings.AccessToken = Data.APIToken.GetTwitchAccessToken();
 
+            // setup for the Discord command handler
             commands = new CommandService(new CommandServiceConfig
             {
                 LogLevel = LogSeverity.Info,
-
-                // There's a few more properties you can set,
-                // for example, case-insensitive commands.
                 CaseSensitiveCommands = false,
             });
-            // Setup your DI container.
+            // setup the DI container.
             services = ConfigureServices();
 
             CommandHandler commandhandler = new CommandHandler(_client, commands);
@@ -68,6 +62,7 @@ namespace Worlddomination
             
             var token = Data.APIToken.GetDiscordClientToken();
 
+            // initialise the stream monitor handler as the parent for all stream monitor instances
             smh.Init();
 
             Console.WriteLine("-----------------------------------[Discord]------------------------------------");

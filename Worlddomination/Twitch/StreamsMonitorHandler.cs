@@ -7,7 +7,7 @@ namespace Worlddomination.Twitch
 {
     public class StreamsMonitorHandler
     {
-        //this class gets initialised when the bot gets started
+        //this class gets initialised when the bot get started
         //and then pulls data in order to setup monitors on all servers that he is setup to do so for
         //we should also setup the RequestHandler for the twitch api here
 
@@ -102,7 +102,7 @@ namespace Worlddomination.Twitch
         // Saves Monitor instances
         public void Save()
         {
-            using (StreamWriter sw = File.CreateText(@Data.Paths.monitor_instances_txt)) //@"C:\Users\luponix\Desktop\[TOHA HEAVY INDUSTRIES]\[C]DiscordBot\Worlddomination\Twitch\MonitorData.txt"))
+            using (StreamWriter sw = File.CreateText(@Data.Paths.monitor_instances_txt))
             {
                 foreach (StreamsMonitor monitor in instances)
                 {

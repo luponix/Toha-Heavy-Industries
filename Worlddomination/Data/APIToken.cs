@@ -11,7 +11,7 @@ namespace Worlddomination.Data
         {
             return "";
         }
-       
+
 
         //Twitch API
         public static string GetTwitchClientId()
@@ -38,6 +38,7 @@ namespace Worlddomination.Data
         {
             return "";
         }
+
 
 
     }

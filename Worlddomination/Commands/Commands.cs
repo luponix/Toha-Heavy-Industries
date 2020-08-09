@@ -22,7 +22,7 @@ namespace Worlddomination.Commands
 
 
         [Command("help")]
-        [Summary("returns current version")]
+        [Summary("gives an overview for the commands")]
         public async Task HelpCommand()
         {
             Discord.EmbedBuilder embed = new EmbedBuilder
@@ -122,7 +122,7 @@ namespace Worlddomination.Commands
 
 
         [Command("whitelist")]
-        [Summary("marks someone as broadcastable")]
+        [Summary("marks someone as broadcastable, is only relevant for the descent streams")]
         public async Task addThatGuy(string streamer)
         {
             if( Program.smh.descent_streamer_whitelist.Contains(streamer) )
@@ -211,6 +211,7 @@ namespace Worlddomination.Commands
             }
             else
             {
+                // build an actual permission system at some point
                 await Context.Channel.SendMessageAsync("Insufficient permissions");
             }
         }

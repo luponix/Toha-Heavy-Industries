@@ -12,21 +12,30 @@ using TwitchLib.Api.Helix.Models.Users;
 
 namespace Worlddomination.Twitch
 {
+    // a class that is incredibly ugly due to hours of testing
+    // needs some cleanup.
+    //  In the end it comes to 3 parts:
+    //   1. Setup a timer that calls every x milliseconds a function
+    //   2. this function calls the twitch api data for a set category
+    //   3. the function parses the data, checks for whitelist,bans,spam
+    //      and maybe broadcasts it to a set discord-server, discord-channel
     public class StreamsMonitor
     {
         private Timer timer;
-        private int timer_intervall = 60000;
-        private string game_id = "491757";
-        private int limit_of_streams = 20;
-        private bool is_monitor_initialized = false;
-        private int event_counter = 0;
+        private int timer_intervall = 60000;  // the x milliseconds delay
+        private string game_id = "491757";    // a twitch category id, probably useless by now, since we grab it with its name now
+        private int limit_of_streams = 20;    // sets how many streams get requested from the twitch api, maximum is 100
+        private bool is_monitor_initialized = false; // circumvents a bug due to my inexperience with async
+        private int event_counter = 0;        // counts the amount of timer events
 
         
-        private string channel_out = "twitch-output";
-        private string server_out = "data";
+        private string channel_out = "twitch-output";   // the discord channel, this monitor should send too, 'twitch-output' = default value
+        private string server_out = "data";             // the discord server, this monitor should send too, 'data' = default value
 
 
         //maybe create a class that unites these informations
+        // holds returned data from the twitch api, need new and old data saved
+        // to compare and circumvent some async madness
         private TwitchLib.Api.V5.Models.Streams.Stream[] streams_array;
         private string[] profile_urls;
         List<string> channel_names = new List<string>();
@@ -35,16 +44,14 @@ namespace Worlddomination.Twitch
         private string[] OLDprofile_urls;
         List<string> OLDchannel_names = new List<string>();
 
-        //Datetime to figure out wether this stream should be posted
+        // Datetime to figure out wether this stream should be posted, prevents unnecessary spam
         private Dictionary<string, DateTime> repost_dict = new Dictionary<string, DateTime>();
 
 
 
 
 
-        // private Stream[] n_streams_array;
-        // private string[] n_channel_names;
-        // private string[] n_profile_urls;
+
 
         //Constructor
         public StreamsMonitor(string id)
@@ -83,7 +90,7 @@ namespace Worlddomination.Twitch
             }
         }
         
-        public int GetIntervall()
+        public int GetIntervall() 
         {
             return timer_intervall;
         }
@@ -107,7 +114,6 @@ namespace Worlddomination.Twitch
         //Timer section:
         public void Awake()
         {
-            //Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " Monitor     Awake");
             var ntimer = new Timer(timer_intervall);
             ntimer.Elapsed += new ElapsedEventHandler(timer_Elapsed);
             ntimer.Enabled = true;
@@ -121,34 +127,37 @@ namespace Worlddomination.Twitch
 
         public  void PopulateStreamsData()
         {
-            Program.smh.banlist = Data.Gate.Load("Streamers");
             if (++event_counter % 100 == 0)
             {
                 Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "    Pulling Data :[" + event_counter + "]");
             }
+
+            // VARIABLES TO HOLD THE DATA
             List<string> ids = new List<string>();
             List<string> user_ids = new List<string>();
             List<string> n_name = new List<string>();
             string[] n_profile = new string[limit_of_streams];
+
+            // GET THE DATA
             TwitchLib.Api.V5.Models.Streams.Stream[] n_streams = new TwitchLib.Api.V5.Models.Streams.Stream[limit_of_streams];
             ids.Add(game_id);
 
-            //var request1 = Program.API.Helix.Streams.GetStreamsAsync(first: limit_of_streams, gameIds: ids).Result;
+            // helix is an unreliable piece of shit
+            // var request1 = Program.API.Helix.Streams.GetStreamsAsync(first: limit_of_streams, gameIds: ids).Result;
             var request = Program.API.V5.Streams.GetLiveStreamsAsync(game: game_id, limit: limit_of_streams).Result;
-            int i = 0;
 
+            // ADD THE DATA
+            int i = 0;
             foreach (TwitchLib.Api.V5.Models.Streams.Stream stream in request.Streams)
             {              
                 user_ids.Add(stream.Channel.Id);            
                 n_streams[i] = stream;
-                //if (!stream.Channel.DisplayName.Equals("luponix3"))
-                //{
-                    //Console.WriteLine(stream.Channel.DisplayName);
-                    n_profile[i] = stream.Channel.Logo;
-                    n_name.Add(stream.Channel.DisplayName);
-                //}
+                n_profile[i] = stream.Channel.Logo;
+                n_name.Add(stream.Channel.DisplayName);
                 i++;
             }
+
+
 
             if (!is_monitor_initialized)
             {
@@ -161,48 +170,45 @@ namespace Worlddomination.Twitch
                 OLDprofile_urls = profile_urls;
                 is_monitor_initialized = true;
             }
-
             else
             {
-                // update banlist
-
-
+                // USE THE DATA
                 // compare old tick and new tick
                 int j = 0;
                 foreach ( string na in n_name)
                 {            
                     if( !channel_names.Contains(n_name[j]) & !OLDchannel_names.Contains(n_name[j]))
-                    {// Broadcast to discord
-                        //Console.WriteLine("|| DID NOT contain : " + n_name[j]);
-
+                    {   
+                        // Broadcast to discord
                         if (!Program.smh.banlist.Contains(n_name[j]))
                         {
                             //look wether this stream is started to frequently
                             bool valid = true;
                             DateTime dateTimeNow = DateTime.Now;
-                            TimeSpan repostTime = new TimeSpan(0, 0, 25, 0, 0);
+                            TimeSpan repostTime = new TimeSpan(0, 0, 25, 0, 0); // 25 minutes is the minimum time between streams from the same channel & game
                             if (repost_dict.ContainsKey(n_name[j])  )
                             {
                                 if (!(dateTimeNow.Subtract(repost_dict.GetValueOrDefault(n_name[j])).CompareTo(repostTime) > 0))
                                 {
                                     valid = false;
                                 }
-                                Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "    " + n_name[j] + " got evaluated: " + valid + " value: " + dateTimeNow.Subtract(repost_dict.GetValueOrDefault(n_name[j])).CompareTo(repostTime));
                                 repost_dict.Remove(n_name[j]);
                             }
                             repost_dict.Add(n_name[j], dateTimeNow);
 
-                            // descent streamer whitelist enactment
-                            if ( (ids[0].Equals("Descent") || ids[0].Equals("Descent II") || ids[0].Equals("Descent 3") )
+                            // descent specific streamer whitelist 
+                            if ( ( ids[0].Equals("Descent") 
+                                || ids[0].Equals("Descent II") 
+                                || ids[0].Equals("Descent 3") )
                                 && !Program.smh.descent_streamer_whitelist.Contains(n_name[j]) )
                             {
+                                // if this is a not whitelisted descent streamer minimize the discord embed
                                 string url = "https://www.twitch.tv/" + n_name[j];
                                 Discord.EmbedBuilder embed = new EmbedBuilder
                                 {};
                                 embed.AddField(n_name[j] + " started streaming " + Format.Bold(ids[0]), "under " + url);               
                                 embed.WithColor(Color.Red);
                                 embed.WithUrl(url); 
-                                // embed.WithCurrentTimestamp();
                                 Discord.Embed embedded = embed.Build();
                                 Misc.SendEmbedWithoutContext("", embedded, channel_out, server_out);
                             }
@@ -213,12 +219,11 @@ namespace Worlddomination.Twitch
                                     Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "    " + n_name[j] + " started streaming " + game_id);
                                     try
                                     {
-                                        // DateTime dateTimeNow = DateTime.Now;
                                         int sec = (dateTimeNow.Hour * 3600000) + (dateTimeNow.Minute * 60000) + (dateTimeNow.Second * 1000) + dateTimeNow.Millisecond;
                                         string name = sec.ToString();
                                         string thumUrl = n_streams[j].Preview.Large;
 
-                                        string[] paths = { @Data.Paths.img_directory, name + ".jpg" };//@"E:\TohaHeavyIndustries Images Archive", name+".jpg" };
+                                        string[] paths = { @Data.Paths.img_directory, name + ".jpg" };
                                         string fullPath = System.IO.Path.Combine(paths);
 
                                         Imgur.Download.DownloadUrl(thumUrl, fullPath);
@@ -292,17 +297,11 @@ namespace Worlddomination.Twitch
 
         public void PrintChannelNames(string server, string channel)
         {
-           // Console.WriteLine("I exist");
-           // string result = "";//"```";
             foreach(TwitchLib.Api.V5.Models.Streams.Stream stream in streams_array)
             {
                 Misc.SendMessageWithoutContext(stream.Channel.DisplayName, channel, server);
-                // result += stream.Channel.DisplayName;//+ "\n";
+
             }
-            
-           // result += "```";
-           // Console.WriteLine(result);
-           // Misc.SendMessageWithoutContext(result, server, channel);
         }
 
     }
