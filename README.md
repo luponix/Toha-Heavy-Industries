@@ -1,4 +1,5 @@
 # Toha-Heavy-Industries
+```
 A small Discord Bot that mainly broadcasts active Twitch streams for some categories 
 
 Overview:
@@ -54,7 +55,6 @@ Classes:
    Imgur.Download.cs nearly obsolete, discord supports just uploading the file directly, lets skip the imgur part once the keys run out
    Imgur.Imgur.cs -||-
    Data.APIToken.cs populate this from a file to make this bot reusable without the need for recompiling
-                             
-                             
+                             ```
            
            
