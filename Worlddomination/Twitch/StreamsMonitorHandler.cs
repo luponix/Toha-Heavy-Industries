@@ -32,7 +32,7 @@ namespace Worlddomination.Twitch
         // start with initialized bool = true so that they broadcast streams
         // but that state shouldnt be saved
         // so add a parameter for that to the StreamsMonitor constructor
-        
+         
         // Add Monitor to In Memory storage and save
         public void Add( string target_server, string target_channel, string game_id,  int intervall, int limit)
         {

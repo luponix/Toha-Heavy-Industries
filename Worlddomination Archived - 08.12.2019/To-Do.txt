@@ -1,4 +1,0 @@
-﻿download the pictures to a project folder
-wrap the async methods in try, catch 
-add profile pictures to embedded
-return the broadcast link in the embedded

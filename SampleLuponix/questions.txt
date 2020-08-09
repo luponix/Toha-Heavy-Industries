@@ -1,7 +1,0 @@
-1. Skal der sendes en privat besked til den anden spiller i tilfælde af cancel, report, confirm? Bemærk modspiller jo navngives ('mention') for flere af disse kommandoer.
-
-2. Skal der sendes privat besked til begge spiller hvis en kamp aflyses pga timeout?
-
-3. Hvad skal timeout sættes til? 24/48 timer eller en uge?
-
-4. Hvad skal timeout sættes til for rank auto-nedryk?
