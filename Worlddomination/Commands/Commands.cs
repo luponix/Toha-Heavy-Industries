@@ -20,6 +20,7 @@ namespace Worlddomination.Commands
         // public variables that should prbably be in program but whatever
         public static IReadOnlyCollection<SocketGuildUser> users;
 
+       
 
         [Command("help")]
         [Summary("gives an overview for the commands")]
@@ -51,6 +52,19 @@ namespace Worlddomination.Commands
             await Context.Channel.SendMessageAsync(embed: embedded);
         }
 
+        [Command("isBanned")]
+        [Summary("null")]
+        public async Task GenericClass1(string streamer)
+        {
+            if ( Permissions.IsUserAuthorized(Context.Message.Author.Username + "#" + Context.Message.Author.Discriminator, 1))
+            {
+                await Context.Channel.SendMessageAsync(Program.smh.banlist.Contains(streamer).ToString());
+            }
+            else
+            {
+                await Context.Channel.SendMessageAsync("Insufficient permissions");
+            }
+        }
 
 
         public static string[] memefileNames;

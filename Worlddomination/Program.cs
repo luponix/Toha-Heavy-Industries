@@ -22,7 +22,7 @@ namespace Worlddomination
 
         public static StreamsMonitorHandler smh = new StreamsMonitorHandler();
 
-        public static string version = "0.8.3";
+        public static string version = "0.8.4";
 
         internal static CommandService commands;
         internal static IServiceProvider services;
@@ -61,6 +61,18 @@ namespace Worlddomination
 
             
             var token = Data.APIToken.GetDiscordClientToken();
+
+
+            // this should not be hardcoded but it will be for now till i add a db
+            // Permissions:
+            Commands.Permissions.Add("luponix#5950", 0);
+            Commands.Permissions.Add("CHILLY_BUS#0001", 1);
+            Commands.Permissions.Add("Yoshimitsu#8541", 1);
+            Commands.Permissions.Add("Hunter#5276", 5);
+            Commands.Permissions.Add("DescentMax7930#9275", 5);
+            Commands.Permissions.Add("derhass#6611", 5);
+            Commands.Permissions.Add("Phyrexy#1281", 5);
+
 
             // initialise the stream monitor handler as the parent for all stream monitor instances
             smh.Init();
