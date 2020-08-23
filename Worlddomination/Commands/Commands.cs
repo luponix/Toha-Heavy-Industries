@@ -194,6 +194,7 @@ namespace Worlddomination.Commands
              || author.Equals("Hunter#5276")
              || author.Equals("DescentMax7930#9275")
              || author.Equals("derhass#6611")
+             || author.Equals("Phyrexy#1281")
              )
             {
                 if(Data.Gate.Load("Streamers").Contains(streamer))
@@ -280,7 +281,7 @@ namespace Worlddomination.Commands
                     string[] paths = { @"E:\TohaHeavyIndustries Images Archive", name + ".jpg" };
                     string fullPath = System.IO.Path.Combine(paths);
 
-                    Imgur.Download.DownloadUrl(thumUrl, fullPath);
+                    Imgur.Download.DownloadUrl(thumUrl, fullPath); 
 
                     Imgur.Imgur imgur = new Imgur.Imgur();
                     string finallink = imgur.GetImageUrl(fullPath);

@@ -22,7 +22,7 @@ namespace Worlddomination
 
         public static StreamsMonitorHandler smh = new StreamsMonitorHandler();
 
-        public static string version = "0.8.2";
+        public static string version = "0.8.3";
 
         internal static CommandService commands;
         internal static IServiceProvider services;
