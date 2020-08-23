@@ -196,26 +196,28 @@ namespace Worlddomination.Twitch
                             }
                             repost_dict.Add(n_name[j], dateTimeNow);
 
-                            // descent specific streamer whitelist 
-                            if ( ( ids[0].Equals("Descent") 
-                                || ids[0].Equals("Descent II") 
-                                || ids[0].Equals("Descent 3") )
-                                && !Program.smh.descent_streamer_whitelist.Contains(n_name[j]) )
+                            if (valid)
                             {
-                                // if this is a not whitelisted descent streamer minimize the discord embed
-                                string url = "https://www.twitch.tv/" + n_name[j];
-                                Discord.EmbedBuilder embed = new EmbedBuilder
-                                {};
-                                embed.AddField(n_name[j] + " started streaming " + Format.Bold(ids[0]), "under " + url);               
-                                embed.WithColor(Color.Red);
-                                embed.WithUrl(url); 
-                                Discord.Embed embedded = embed.Build();
-                                Misc.SendEmbedWithoutContext("", embedded, channel_out, server_out);
-                            }
-                            else
-                            {
-                                if (valid)
+                                // descent specific streamer whitelist 
+                                if ((ids[0].Equals("Descent")
+                                || ids[0].Equals("Descent II")
+                                || ids[0].Equals("Descent 3"))
+                                && !Program.smh.descent_streamer_whitelist.Contains(n_name[j]))
                                 {
+                                    // if this is a not whitelisted descent streamer minimize the discord embed
+                                    string url = "https://www.twitch.tv/" + n_name[j];
+                                    Discord.EmbedBuilder embed = new EmbedBuilder
+                                    { };
+                                    embed.AddField(n_name[j] + " started streaming " + Format.Bold(ids[0]), "under " + url);
+                                    embed.WithColor(Color.Red);
+                                    embed.WithUrl(url);
+                                    Discord.Embed embedded = embed.Build();
+                                    Misc.SendEmbedWithoutContext("", embedded, channel_out, server_out);
+                                }
+                                else
+                                {
+
+
                                     Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "    " + n_name[j] + " started streaming " + game_id);
                                     try
                                     {
@@ -262,10 +264,10 @@ namespace Worlddomination.Twitch
                                     {
                                         Console.WriteLine("Encountered Exception: " + n_name[j]);
                                     }
-                                }
-                            }
 
-                       
+                                }
+
+                            }
 
 
                         }
