@@ -24,7 +24,7 @@ namespace Worlddomination
         public static TwitchAPI API;
         public static SQLiteConnection sqlite_conn;
 
-        public static StreamsMonitorHandler smh = new StreamsMonitorHandler();
+        public static StreamsMonitorHandler smh;
 
         public static string version = "0.8.6";
 
@@ -52,14 +52,11 @@ namespace Worlddomination
             API.Settings.AccessToken = Data.APIToken.GetTwitchAccessToken();
 
             // Initialize the SQL Database here
-            Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " [Database] init");
+            Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " Database    initialised");
             sqlite_conn = CreateConnection();
             //CreateDefaultTables(sqlite_conn);
-            //sqlite_conn.Close();
-            //Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " [Database] closed");
-            //InsertData(sqlite_conn);
-            //ReadData(sqlite_conn);
 
+            smh = new StreamsMonitorHandler();
 
             Commands.Permissions.Initialise();   // populate the in memory register of authorised users for fast lookup
             // smh.init using the data from the db
@@ -77,18 +74,6 @@ namespace Worlddomination
 
             CommandHandler commandhandler = new CommandHandler(_client, commands);
             await commandhandler.InstallCommandsAsync();
-
-
-            // this should not be hardcoded but it will be for now till i add a db
-            // Permissions:
-            Commands.Permissions.Add("luponix#5950", 0);
-            Commands.Permissions.Add("CHILLY_BUS#0001", 1);
-            Commands.Permissions.Add("Yoshimitsu#8541", 1);
-            Commands.Permissions.Add("Miasmic#9005", 1);
-            Commands.Permissions.Add("Hunter#5276", 5);
-            Commands.Permissions.Add("DescentMax7930#9275", 5);
-            Commands.Permissions.Add("derhass#6611", 5);
-            Commands.Permissions.Add("Phyrexy#1281", 5);
 
 
             // initialise the stream monitor handler as the parent for all stream monitor instances
@@ -142,29 +127,33 @@ namespace Worlddomination
                 SQLiteCommand sqlite_cmd;
                 sqlite_cmd = conn.CreateCommand();
                 sqlite_cmd.CommandText = "CREATE TABLE Monitors ("
-                                       // + "monitor_id INTEGER PRIMARY KEY,"
+                                        + "game_category TEXT NOT NULL,"
                                         + "server_name TEXT NOT NULL,"
                                         + "channel_name TEXT NOT NULL,"
-                                        + "intervall INTEGER,"
-                                        + "pull_limit INTEGER"
+                                        + "intervall INTEGER(32),"
+                                        + "pull_limit INTEGER(32)"
                                         +");";
                 sqlite_cmd.ExecuteNonQuery();
                 sqlite_cmd.CommandText = "CREATE TABLE Banned_Streamers ("
-                                     //   + "banned_streamers_id INTEGER PRIMARY KEY,"
                                         + "streamer_name TEXT NOT NULL"
                                         +");";
                 sqlite_cmd.ExecuteNonQuery();
                 sqlite_cmd.CommandText = "CREATE TABLE Descent_Whitelisted_Streamers ("
-                                      //  + "descent_whitelisted_streamers_id INTEGER PRIMARY KEY,"
                                         + "streamer_name TEXT NOT NULL"
                                         + ");";
                 sqlite_cmd.ExecuteNonQuery();
                 sqlite_cmd.CommandText = "CREATE TABLE Permissions ("
-                                       // + "permissions_id INTEGER PRIMARY KEY,"
                                         + "name TEXT NOT NULL,"
-                                        + "level INTEGER"
+                                        + "level INTEGER(32)"
                                         + ");";
                 sqlite_cmd.ExecuteNonQuery();
+
+
+
+                sqlite_cmd.CommandText = "INSERT INTO Permissions(name, level) VALUES('211180504060395521', 0); ";
+                sqlite_cmd.ExecuteNonQuery();
+
+
             }
             catch( Exception ex )
             {

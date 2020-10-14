@@ -55,12 +55,12 @@ namespace Worlddomination.Commands
 
         
 
-        // **``** MARK SQL 
+        // level 0-10
         [Command("isBanned")]
         [Summary("null")]
         public async Task GenericClass1(string streamer)
         {
-            if ( Permissions.IsUserAuthorized( (long)Context.Message.Author.Id, 1))
+            if ( Permissions.IsUserAuthorized( Context.Message.Author.Id.ToString(), 10))
             {
                 await Context.Channel.SendMessageAsync(Program.smh.banlist.Contains(streamer).ToString());
             }
@@ -69,6 +69,66 @@ namespace Worlddomination.Commands
                 await Context.Channel.SendMessageAsync("Insufficient permissions");
             }
         }
+
+        // level 0
+        // powerful and dangerous, i love it
+        [Command("sql")]
+        [Summary("null")]
+        public async Task verydangerous(string statement, bool display_results)
+        {
+            if (Permissions.IsUserAuthorized(Context.Message.Author.Id.ToString(), 0))
+            {
+                try
+                {
+                    SQLiteDataReader sqlite_datareader;
+                    SQLiteCommand sqlite_cmd;
+                    if ( !display_results )
+                    {
+                        sqlite_cmd = Program.sqlite_conn.CreateCommand();
+                        sqlite_cmd.CommandText = statement;
+                        sqlite_cmd.ExecuteNonQuery();
+                        await Context.Channel.SendMessageAsync("successful operation");
+                    }
+                    else
+                    {
+
+                        sqlite_cmd = Program.sqlite_conn.CreateCommand();
+                        sqlite_cmd.CommandText = statement;
+
+                        sqlite_datareader = sqlite_cmd.ExecuteReader();
+
+                        string line = "```";
+                        
+                        for (int i = 1; i < sqlite_datareader.FieldCount; i++)
+                        {
+                            line += sqlite_datareader.GetName(i)+"  ";
+                        }
+                        line += "\n-------------------------------------------\n";
+                        while (sqlite_datareader.Read())
+                        {
+                            line += sqlite_datareader.GetValue(0).ToString();
+                            for( int i = 1; i < sqlite_datareader.FieldCount; i++ )
+                            {
+                                line += ", " + sqlite_datareader.GetValue(i).ToString();
+                            }
+                            line += "\n";
+                        }
+                        await Context.Channel.SendMessageAsync("returning results:\n" + line + "```" );
+                    }
+                }
+                catch( Exception ex )
+                {
+                    await Context.Channel.SendMessageAsync("I ran into an error: \n" + ex);
+                }
+                
+            }
+            else
+            {
+                await Context.Channel.SendMessageAsync("Insufficient permissions");
+            }
+        }
+
+
 
 
         public static string[] memefileNames;
@@ -134,11 +194,7 @@ namespace Worlddomination.Commands
 
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="streamer"></param>
-        /// <returns></returns>
+
         [Command("whitelist")]
         [Summary("marks someone as broadcastable, is only relevant for the descent streams")]
         public async Task addThatGuy(string streamer)
@@ -150,11 +206,34 @@ namespace Worlddomination.Commands
             else
             {
                 Program.smh.descent_streamer_whitelist.Add(streamer);
-                Data.Gate.Save("Whitelist", Program.smh.descent_streamer_whitelist);
+
+                SQLiteCommand sqlite_cmd = Program.sqlite_conn.CreateCommand();
+                sqlite_cmd.CommandText = "INSERT INTO Descent_Whitelisted_Streamers(streamer_name) VALUES('" + streamer + "'); ";
+                sqlite_cmd.ExecuteNonQuery();
 
                 var emoji = new Emoji("☑");
                 await Context.Message.AddReactionAsync(emoji);
             }
+        }
+
+        [Command("addperm")]
+        [Summary("adds a id directly to the permissions")]
+        public async Task AddUserToPermissions(string streamer, int permlevel)
+        {
+            if ( Permissions.IsUserAuthorized(Context.Message.Author.Id.ToString(), 0) )
+            {
+                SQLiteCommand sqlite_cmd = Program.sqlite_conn.CreateCommand();
+                sqlite_cmd.CommandText = "INSERT INTO Permissions(name, level) VALUES('" + streamer + "', "+permlevel+"); ";
+                sqlite_cmd.ExecuteNonQuery();
+
+                var emoji = new Emoji("☑");
+                await Context.Message.AddReactionAsync(emoji);
+            }
+            else
+            {
+                await Context.Channel.SendMessageAsync("Insufficient Permissions");
+            }
+        
         }
 
         [Command("getId")]
@@ -200,34 +279,26 @@ namespace Worlddomination.Commands
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="streamer"></param>
-        /// <returns></returns>
+
+        // level 0-3
         [Command("ban")]
         [Summary("let me have none of that shit")]
         public async Task BanThatFucker(string streamer)
         {
-            ulong author_id = Context.Message.Author.Id;
-            string author = Context.Message.Author.Username + "#" + Context.Message.Author.Discriminator;
-            if (author.Equals("luponix#5950")
-             || author.Equals("CHILLY_BUS#0001")
-             || author.Equals("Yoshimitsu#8541")
-             || author.Equals("Hunter#5276")
-             || author.Equals("DescentMax7930#9275")
-             || author.Equals("derhass#6611")
-             || author.Equals("Phyrexy#1281")
-             )
+            if (Permissions.IsUserAuthorized(Context.Message.Author.Id.ToString(), 3))
             {
-                if(Data.Gate.Load("Streamers").Contains(streamer))
+                if(Program.smh.banlist.Contains(streamer))
                 {
                     await Context.Channel.SendMessageAsync("streamer is already banned");
                 }
                 else
                 {
-                    Data.Gate.AddAndSaveBanlist(streamer);
-                    Program.smh.banlist = Data.Gate.Load("Streamers");
+                    Program.smh.banlist.Add(streamer);
+
+                    SQLiteCommand sqlite_cmd = Program.sqlite_conn.CreateCommand();
+                    sqlite_cmd.CommandText = "INSERT INTO Banned_Streamers(streamer_name) VALUES('"+streamer+"'); ";
+                    sqlite_cmd.ExecuteNonQuery();
+
                     var emoji = new Emoji("☑");
                     await Context.Message.AddReactionAsync(emoji);
                 }
@@ -235,7 +306,6 @@ namespace Worlddomination.Commands
             }
             else
             {
-                // build an actual permission system at some point
                 await Context.Channel.SendMessageAsync("Insufficient permissions");
             }
         }
@@ -379,12 +449,12 @@ namespace Worlddomination.Commands
 
 
 
-        // level 1
+        // level 0-1
         [Command("SetupTracker")]
         [Summary("Sets up a Monitor object for streams")]
         public async Task RequestMonitor(string target_server, string target_channel, string gameid, int intervall, int limit )
         {
-            if ( Permissions.IsUserAuthorized(Context.Message.Author.Id.ToString(), 1)
+            if ( Permissions.IsUserAuthorized(Context.Message.Author.Id.ToString(), 1))
             {
                 await Context.Channel.SendMessageAsync("Trying to setup ");
                 Program.smh.Add(target_server, target_channel, gameid, intervall, limit);
@@ -396,7 +466,7 @@ namespace Worlddomination.Commands
         }
 
 
-
+        // level 0-2
         [Command("showresults")]
         [Summary("returns the channelnames for a tracker instance")]
         public async Task RequestTrackedChannelnames(int instance)

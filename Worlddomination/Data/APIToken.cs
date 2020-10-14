@@ -6,7 +6,6 @@ namespace Worlddomination.Data
 {
     class APIToken
     {
-
         //Discord API
         public static string GetDiscordClientToken()
         {
@@ -39,6 +38,7 @@ namespace Worlddomination.Data
         {
             return "";
         }
+
 
     }
 }

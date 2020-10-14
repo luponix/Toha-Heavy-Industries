@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.IO;
 using System.Text;
 
@@ -19,8 +20,30 @@ namespace Worlddomination.Twitch
         public StreamsMonitorHandler()
         {
             instances = new List<StreamsMonitor>();
-            descent_streamer_whitelist = Data.Gate.Load("Whitelist");
-            banlist = Data.Gate.Load("Streamers");
+            
+            banlist = new List<string>();
+
+            SQLiteDataReader sqlite_datareader;
+            SQLiteCommand sqlite_cmd = Program.sqlite_conn.CreateCommand();
+            sqlite_cmd.CommandText = "SELECT * FROM Banned_Streamers";
+
+            sqlite_datareader = sqlite_cmd.ExecuteReader();
+            while (sqlite_datareader.Read())
+            {
+                banlist.Add(sqlite_datareader.GetString(0));
+            }
+
+
+            descent_streamer_whitelist = new List<string>();
+            sqlite_cmd = Program.sqlite_conn.CreateCommand();
+            sqlite_cmd.CommandText = "SELECT * FROM Descent_Whitelisted_Streamers";
+
+            sqlite_datareader = sqlite_cmd.ExecuteReader();
+            while (sqlite_datareader.Read())
+            {
+                descent_streamer_whitelist.Add(sqlite_datareader.GetString(0));
+            }
+
         }
 
         public void Init()
@@ -41,79 +64,39 @@ namespace Worlddomination.Twitch
             instances.Add(stm);
             Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "    [Monitor Added*] arg: " + target_server + ", " + target_channel + ", " + game_id
                             + ", " + limit + ", " + intervall);
-            //save
-            Save();
+
+            SQLiteCommand sqlite_cmd = Program.sqlite_conn.CreateCommand();
+            sqlite_cmd.CommandText = "INSERT INTO Monitors(game_category, server_name, channel_name, intervall, pull_limit)"
+                                    +" VALUES('" +game_id+ "', '" +target_server + "', '" +target_channel+ "', "+intervall+", "+limit+"  ); ";
+            sqlite_cmd.ExecuteNonQuery();
+
         }
 
         // Loads and creates Monitor instances // should only be called initially when the bot starts
         public void Load()
         {
-            string file_path = @Data.Paths.monitor_instances_txt;//@"C:\Users\luponix\Desktop\[TOHA HEAVY INDUSTRIES]\[C]DiscordBot\Worlddomination\Twitch\MonitorData.txt";
-            
-            List<string> content = new List<string> { };
-            if (File.Exists(file_path))
+
+            SQLiteCommand sqlite_cmd = Program.sqlite_conn.CreateCommand();
+            sqlite_cmd.CommandText = "SELECT * FROM Monitors";
+
+            SQLiteDataReader sqlite_datareader = sqlite_cmd.ExecuteReader();
+            while (sqlite_datareader.Read())
             {
-                using (StreamReader f = new StreamReader(file_path))
-                {
-                    string target_server = "";
-                    string target_channel = "";
-                    string game_id = "";
-                    string intervall = "";
-                    string limit = "";
+                string game_id = sqlite_datareader.GetValue(0).ToString();
+                string target_server = sqlite_datareader.GetValue(1).ToString();
+                string target_channel = sqlite_datareader.GetValue(2).ToString();
+                int intervall = (int)(long)sqlite_datareader.GetValue(3);
+                int limit = (int)(long)sqlite_datareader.GetValue(4);
 
-                    string line;
-                    int counter = 0;
-                    while ((line = f.ReadLine()) != null && line != "")
-                    {                   
-                        if( counter == 0 )
-                        {
-                            target_server = line;
-                        }
-                        if (counter == 1)
-                        {
-                            target_channel = line;
-                        }
-                        if (counter == 2)
-                        {
-                            game_id = line;
-                        }
-                        if (counter == 3)
-                        {
-                            intervall = line;
-                        }
-                        if (counter == 4)
-                        {
-                            limit = line;
-                            StreamsMonitor stm = new StreamsMonitor(game_id, StringToInt(intervall), StringToInt(limit), target_channel, target_server, false);
-                            stm.Awake();
-                            instances.Add(stm);
-                            Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " [Monitor Added] arg: "+ target_server +", "+target_channel+", "+game_id
-                                            + ", "+ limit+ ", "+intervall);
-                            counter = -1;
-                        }
-                        counter++;
-                    }
-                }
+                StreamsMonitor stm = new StreamsMonitor(game_id, intervall, limit, target_channel, target_server, false);
+                stm.Awake();
+                instances.Add(stm);
 
-            }
-            
-        }
-
-        // Saves Monitor instances
-        public void Save()
-        {
-            using (StreamWriter sw = File.CreateText(@Data.Paths.monitor_instances_txt))
-            {
-                foreach (StreamsMonitor monitor in instances)
-                {
-                    sw.WriteLine(monitor.GetTargetServer());
-                    sw.WriteLine(monitor.GetTargetChannel());
-                    sw.WriteLine(monitor.GetGameID());
-                    sw.WriteLine(monitor.GetIntervall().ToString());
-                    sw.WriteLine(monitor.GetStreamLimit().ToString());
-                }
+                Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "    [Monitor Added] arg: " + target_server + ", " + target_channel + ", " + game_id
+                            + ", " + limit + ", " + intervall);
             }
         }
+
 
         private int StringToInt( string intString )
         {

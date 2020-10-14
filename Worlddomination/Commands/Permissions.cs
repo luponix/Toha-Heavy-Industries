@@ -22,7 +22,7 @@ namespace Worlddomination.Commands
             while (sqlite_datareader.Read())
             {
                 string id = sqlite_datareader.GetValue(0).ToString();
-                int level = (int)sqlite_datareader.GetValue(1);
+                int level = (int)(long)sqlite_datareader.GetValue(1);
                 users.Add( id, level);
             }
         }
