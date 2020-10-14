@@ -7,6 +7,9 @@ using System.Reflection;
 using System.Threading.Tasks;
 using TwitchLib.Api;
 using Worlddomination.Twitch;
+using System.Data.SQLite;
+using System.Linq;
+using System.Text;
 
 namespace Worlddomination
 {
@@ -19,10 +22,11 @@ namespace Worlddomination
             => new Program().MainAsync(args).GetAwaiter().GetResult();
         public static DiscordSocketClient _client;
         public static TwitchAPI API;
+        public static SQLiteConnection sqlite_conn;
 
         public static StreamsMonitorHandler smh = new StreamsMonitorHandler();
 
-        public static string version = "0.8.4";
+        public static string version = "0.8.6";
 
         internal static CommandService commands;
         internal static IServiceProvider services;
@@ -47,6 +51,21 @@ namespace Worlddomination
             API.Settings.Secret = Data.APIToken.GetTwitchClientSecret();           
             API.Settings.AccessToken = Data.APIToken.GetTwitchAccessToken();
 
+            // Initialize the SQL Database here
+            Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " [Database] init");
+            sqlite_conn = CreateConnection();
+            //CreateDefaultTables(sqlite_conn);
+            //sqlite_conn.Close();
+            //Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " [Database] closed");
+            //InsertData(sqlite_conn);
+            //ReadData(sqlite_conn);
+
+
+            Commands.Permissions.Initialise();   // populate the in memory register of authorised users for fast lookup
+            // smh.init using the data from the db
+
+
+
             // setup for the Discord command handler
             commands = new CommandService(new CommandServiceConfig
             {
@@ -59,15 +78,13 @@ namespace Worlddomination
             CommandHandler commandhandler = new CommandHandler(_client, commands);
             await commandhandler.InstallCommandsAsync();
 
-            
-            var token = Data.APIToken.GetDiscordClientToken();
-
 
             // this should not be hardcoded but it will be for now till i add a db
             // Permissions:
             Commands.Permissions.Add("luponix#5950", 0);
             Commands.Permissions.Add("CHILLY_BUS#0001", 1);
             Commands.Permissions.Add("Yoshimitsu#8541", 1);
+            Commands.Permissions.Add("Miasmic#9005", 1);
             Commands.Permissions.Add("Hunter#5276", 5);
             Commands.Permissions.Add("DescentMax7930#9275", 5);
             Commands.Permissions.Add("derhass#6611", 5);
@@ -79,7 +96,7 @@ namespace Worlddomination
 
             Console.WriteLine("-----------------------------------[Discord]------------------------------------");
 
-            await _client.LoginAsync(TokenType.Bot, token);
+            await _client.LoginAsync(TokenType.Bot, Data.APIToken.GetDiscordClientToken());
             await _client.StartAsync();
 
             
@@ -99,6 +116,95 @@ namespace Worlddomination
             return map.BuildServiceProvider();
         }
 
-        
+
+
+        static SQLiteConnection CreateConnection()
+        {
+            SQLiteConnection sqlite_conn;
+            // Create a new database connection:
+            sqlite_conn = new SQLiteConnection("Data Source=Worlddomination.db; Version = 3; New = True; Compress = True; ");
+            // Open the connection:
+            try
+            {
+                sqlite_conn.Open();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("[DB EXCEPTION] /n" + ex + "/n");
+            }
+            return sqlite_conn;
+        }
+
+        static void CreateDefaultTables(SQLiteConnection conn)
+        {
+            try
+            {
+                SQLiteCommand sqlite_cmd;
+                sqlite_cmd = conn.CreateCommand();
+                sqlite_cmd.CommandText = "CREATE TABLE Monitors ("
+                                       // + "monitor_id INTEGER PRIMARY KEY,"
+                                        + "server_name TEXT NOT NULL,"
+                                        + "channel_name TEXT NOT NULL,"
+                                        + "intervall INTEGER,"
+                                        + "pull_limit INTEGER"
+                                        +");";
+                sqlite_cmd.ExecuteNonQuery();
+                sqlite_cmd.CommandText = "CREATE TABLE Banned_Streamers ("
+                                     //   + "banned_streamers_id INTEGER PRIMARY KEY,"
+                                        + "streamer_name TEXT NOT NULL"
+                                        +");";
+                sqlite_cmd.ExecuteNonQuery();
+                sqlite_cmd.CommandText = "CREATE TABLE Descent_Whitelisted_Streamers ("
+                                      //  + "descent_whitelisted_streamers_id INTEGER PRIMARY KEY,"
+                                        + "streamer_name TEXT NOT NULL"
+                                        + ");";
+                sqlite_cmd.ExecuteNonQuery();
+                sqlite_cmd.CommandText = "CREATE TABLE Permissions ("
+                                       // + "permissions_id INTEGER PRIMARY KEY,"
+                                        + "name TEXT NOT NULL,"
+                                        + "level INTEGER"
+                                        + ");";
+                sqlite_cmd.ExecuteNonQuery();
+            }
+            catch( Exception ex )
+            {
+                Console.WriteLine(ex);
+            }
+            
+
+        }
+
+        static void InsertData(SQLiteConnection conn)
+        {
+            SQLiteCommand sqlite_cmd;
+            sqlite_cmd = Program.sqlite_conn.CreateCommand();
+            sqlite_cmd.CommandText = "INSERT INTO SampleTable(Col1, Col2) VALUES('Test Text ', 1); ";
+            sqlite_cmd.ExecuteNonQuery();
+            sqlite_cmd.CommandText = "INSERT INTO SampleTable(Col1, Col2) VALUES('Hallo Ich ', 2); ";
+            sqlite_cmd.ExecuteNonQuery();
+            sqlite_cmd.CommandText = "INSERT INTO SampleTable(Col1, Col2) VALUES('Test2 Bin ', 3); ";
+            sqlite_cmd.ExecuteNonQuery();
+
+
+            sqlite_cmd.CommandText = "INSERT INTO SampleTable1(Col1, Col2) VALUES('Ein Baum ', 3); ";
+            sqlite_cmd.ExecuteNonQuery();
+
+        }
+
+        static void ReadData(SQLiteConnection conn)
+        {
+            SQLiteDataReader sqlite_datareader;
+            SQLiteCommand sqlite_cmd;
+            sqlite_cmd = conn.CreateCommand();
+            sqlite_cmd.CommandText = "SELECT * FROM SampleTable";
+
+            sqlite_datareader = sqlite_cmd.ExecuteReader();
+            while (sqlite_datareader.Read())
+            {
+                string myreader = sqlite_datareader.GetString(0);
+                Console.WriteLine(myreader);
+            }
+            conn.Close();
+        }
     }
 }

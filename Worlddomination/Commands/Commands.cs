@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -46,17 +47,20 @@ namespace Worlddomination.Commands
                 Format.Code("-getid <discordname>") + "\n   return the snowflake for a full discord name \n\n"
                 );
             embed.WithColor(Color.Blue);
-            embed.WithCurrentTimestamp();
+            embed.WithCurrentTimestamp();  
             Discord.Embed embedded = embed.Build();
 
             await Context.Channel.SendMessageAsync(embed: embedded);
         }
 
+        
+
+        // **``** MARK SQL 
         [Command("isBanned")]
         [Summary("null")]
         public async Task GenericClass1(string streamer)
         {
-            if ( Permissions.IsUserAuthorized(Context.Message.Author.Username + "#" + Context.Message.Author.Discriminator, 1))
+            if ( Permissions.IsUserAuthorized( (long)Context.Message.Author.Id, 1))
             {
                 await Context.Channel.SendMessageAsync(Program.smh.banlist.Contains(streamer).ToString());
             }
@@ -77,13 +81,9 @@ namespace Worlddomination.Commands
             {
                 if (Directory.Exists(Data.Paths.meme_directory))
                 {
-                    if (memefileNames != null)
+                    memefileNames = Directory.GetFiles(Data.Paths.meme_directory);
+                    if (memefileNames.Length > 0)
                     {
-                        await Context.Channel.SendFileAsync(memefileNames[new Random().Next(memefileNames.Length)]);
-                    }
-                    else
-                    {
-                        memefileNames = Directory.GetFiles(Data.Paths.meme_directory);
                         await Context.Channel.SendFileAsync(memefileNames[new Random().Next(memefileNames.Length)]);
                     }
                 }
@@ -134,7 +134,11 @@ namespace Worlddomination.Commands
 
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="streamer"></param>
+        /// <returns></returns>
         [Command("whitelist")]
         [Summary("marks someone as broadcastable, is only relevant for the descent streams")]
         public async Task addThatGuy(string streamer)
@@ -196,6 +200,11 @@ namespace Worlddomination.Commands
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="streamer"></param>
+        /// <returns></returns>
         [Command("ban")]
         [Summary("let me have none of that shit")]
         public async Task BanThatFucker(string streamer)
@@ -368,12 +377,14 @@ namespace Worlddomination.Commands
             await Context.Channel.SendMessageAsync("Done");
         }
 
+
+
+        // level 1
         [Command("SetupTracker")]
         [Summary("Sets up a Monitor object for streams")]
         public async Task RequestMonitor(string target_server, string target_channel, string gameid, int intervall, int limit )
         {
-            if ((Context.Message.Author.Username + "#" + Context.Message.Author.Discriminator).Equals("luponix#5950")
-             || (Context.Message.Author.Username + "#" + Context.Message.Author.Discriminator).Equals("CHILLY_BUS#0001"))
+            if ( Permissions.IsUserAuthorized(Context.Message.Author.Id.ToString(), 1)
             {
                 await Context.Channel.SendMessageAsync("Trying to setup ");
                 Program.smh.Add(target_server, target_channel, gameid, intervall, limit);
@@ -384,11 +395,13 @@ namespace Worlddomination.Commands
             }
         }
 
+
+
         [Command("showresults")]
         [Summary("returns the channelnames for a tracker instance")]
         public async Task RequestTrackedChannelnames(int instance)
         {
-            if ((Context.Message.Author.Username + "#" + Context.Message.Author.Discriminator).Equals("luponix#5950"))
+            if (Permissions.IsUserAuthorized( Context.Message.Author.Id.ToString() , 2))
             {
                 await Context.Channel.SendMessageAsync("Processing...");
 
@@ -400,7 +413,13 @@ namespace Worlddomination.Commands
             }
         }
 
-       
-
+       /*
+        private static bool IsUserAuthorized( long id, int perm_level_required )
+        {
+            sqlite_cmd = Program.sqlite_conn.CreateCommand();
+            sqlite_cmd.CommandText = "INSERT INTO SampleTable(Col1, Col2) VALUES('Test Text ', 1); ";
+            sqlite_cmd.ExecuteNonQuery();
+            return false;
+        }*/
     }
 }
