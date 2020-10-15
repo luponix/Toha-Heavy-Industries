@@ -1,7 +1,12 @@
-﻿1. write proper data management, sql
-2. write a small permission system
-3. expand thi txt to api token
+﻿1. write proper data management, sql                      DONE
+2. write a small permission system                        DONE
+ get rid of MonitorData.txt and clean up the Data Section DONE
+3. expand thi txt to api token                            DONE
 4. get rid of uploading to imgur and directly upload snapshots to discord
 5. expand commands to prevent having to ssh to adjust files
 6. experiment with signalling the status to the GPIO
 7. bot should be able to delete/edit his own messages
+8. add ronclis tracker database
+9. sanitize the sql command and open it up to public use
+10. experiment with graphs and elo systems with the tracker data
+11. experiment with visualisation 

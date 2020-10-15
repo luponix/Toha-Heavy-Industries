@@ -40,6 +40,8 @@ namespace Worlddomination
 
             Data.Paths.Initialise();
             Console.WriteLine("Initialised Paths");
+            Data.APIToken.Populate();
+
 
             // initialise Discord
             _client = new DiscordSocketClient();

@@ -14,8 +14,8 @@ namespace Worlddomination.Twitch
 {
     // a class that is incredibly ugly due to hours of testing
     // needs some cleanup.
-    //  In the end it comes to 3 parts:
-    //   1. Setup a timer that calls every x milliseconds a function
+    //  In the end it comes down to 3 parts:
+    //   1. Setup a timer that calls a function every x milliseconds 
     //   2. this function calls the twitch api data for a set category
     //   3. the function parses the data, checks for whitelist,bans,spam
     //      and maybe broadcasts it to a set discord-server, discord-channel
@@ -23,7 +23,7 @@ namespace Worlddomination.Twitch
     {
         private Timer timer;
         private int timer_intervall = 60000;  // the x milliseconds delay
-        private string game_id = "491757";    // a twitch category id, probably useless by now, since we grab it with its name now
+        private string game_id = "491757";    // a twitch category id, probably useless by now, since we grab it with its name
         private int limit_of_streams = 20;    // sets how many streams get requested from the twitch api, maximum is 100
         private bool is_monitor_initialized = false; // circumvents a bug due to my inexperience with async
         private int event_counter = 0;        // counts the amount of timer events

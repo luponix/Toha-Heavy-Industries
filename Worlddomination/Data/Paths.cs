@@ -9,19 +9,23 @@ namespace Worlddomination.Data
     {
         public static string paths_txt = Path.Combine(Directory.GetCurrentDirectory(), "THI-paths.txt");
 
-        public static string monitor_instances_txt = @"C:\Users\luponix\Desktop\[TOHA HEAVY INDUSTRIES]\[C]DiscordBot\Worlddomination\Twitch\MonitorData.txt";
+        public static string APIToken = Path.Combine(Directory.GetCurrentDirectory(), "APIToken.txt");
 
-        public static string img_directory = @"E:\TohaHeavyIndustries Images Archive";
+        public static string img_directory = Directory.GetCurrentDirectory();
 
-        public static string meme_directory = @"C:\Users\luponix\Desktop\Ausgelagert\approved memes";
+        public static string meme_directory = Directory.GetCurrentDirectory();
 
-        // also load the tokens from a file to make this runnable under all circumstances without needing to recompile
+       
 
         public static void Initialise()
         {
             if (File.Exists(paths_txt))
             {
                 ReadPathFile();
+                Console.WriteLine(" Found Paths file, using");
+                //Console.WriteLine("  path APIToken: " + APIToken);
+                Console.WriteLine("  path ImageArc: " + img_directory);
+                Console.WriteLine("  path MemeDire: " + meme_directory);
             }
             else
             {
@@ -34,12 +38,12 @@ namespace Worlddomination.Data
         {
             using (StreamReader sw = new StreamReader(paths_txt))
             {
-                string line0 = sw.ReadLine();
+                //string line0 = sw.ReadLine();
                 string line1 = sw.ReadLine();
                 string line2 = sw.ReadLine();
-                if( line0 != null && line1 != null && line2 != null )
+                if( /*line0 != null &&*/ line1 != null && line2 != null )
                 {
-                    monitor_instances_txt = line0;
+                    //APIToken = line0;
                     img_directory = line1;
                     meme_directory = line2;
                 }
@@ -55,7 +59,7 @@ namespace Worlddomination.Data
         {
             using (StreamWriter sw = File.CreateText(paths_txt))
             {
-                sw.WriteLine(monitor_instances_txt);
+                //sw.WriteLine(APIToken);
                 sw.WriteLine(img_directory);
                 sw.WriteLine(meme_directory);
             }
