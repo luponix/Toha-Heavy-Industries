@@ -99,7 +99,7 @@ namespace Worlddomination.Commands
 
                         string line = "```";
                         
-                        for (int i = 1; i < sqlite_datareader.FieldCount; i++)
+                        for (int i = 0; i < sqlite_datareader.FieldCount; i++)
                         {
                             line += sqlite_datareader.GetName(i)+"  ";
                         }
@@ -216,7 +216,9 @@ namespace Worlddomination.Commands
             }
         }
 
-        [Command("addperm")]
+
+
+    [Command("addperm")]
         [Summary("adds a id directly to the permissions")]
         public async Task AddUserToPermissions(string streamer, int permlevel)
         {
@@ -225,6 +227,8 @@ namespace Worlddomination.Commands
                 SQLiteCommand sqlite_cmd = Program.sqlite_conn.CreateCommand();
                 sqlite_cmd.CommandText = "INSERT INTO Permissions(name, level) VALUES('" + streamer + "', "+permlevel+"); ";
                 sqlite_cmd.ExecuteNonQuery();
+
+                Permissions.Add(Context.Message.Author.Id.ToString(), permlevel);
 
                 var emoji = new Emoji("☑");
                 await Context.Message.AddReactionAsync(emoji);
@@ -483,13 +487,6 @@ namespace Worlddomination.Commands
             }
         }
 
-       /*
-        private static bool IsUserAuthorized( long id, int perm_level_required )
-        {
-            sqlite_cmd = Program.sqlite_conn.CreateCommand();
-            sqlite_cmd.CommandText = "INSERT INTO SampleTable(Col1, Col2) VALUES('Test Text ', 1); ";
-            sqlite_cmd.ExecuteNonQuery();
-            return false;
-        }*/
+
     }
 }

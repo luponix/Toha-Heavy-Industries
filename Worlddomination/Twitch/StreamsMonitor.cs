@@ -136,6 +136,7 @@ namespace Worlddomination.Twitch
             List<string> ids = new List<string>();
             List<string> user_ids = new List<string>();
             List<string> n_name = new List<string>();
+            string[] urls = new string[limit_of_streams];
             string[] n_profile = new string[limit_of_streams];
 
             // GET THE DATA
@@ -145,7 +146,7 @@ namespace Worlddomination.Twitch
             // helix is an unreliable piece of shit
             // var request1 = Program.API.Helix.Streams.GetStreamsAsync(first: limit_of_streams, gameIds: ids).Result;
             var request = Program.API.V5.Streams.GetLiveStreamsAsync(game: game_id, limit: limit_of_streams).Result;
-
+            
             // ADD THE DATA
             int i = 0;
             foreach (TwitchLib.Api.V5.Models.Streams.Stream stream in request.Streams)
@@ -154,6 +155,7 @@ namespace Worlddomination.Twitch
                 n_streams[i] = stream;
                 n_profile[i] = stream.Channel.Logo;
                 n_name.Add(stream.Channel.DisplayName);
+                urls[i] = stream.Channel.Url;
                 i++;
             }
 
@@ -186,6 +188,13 @@ namespace Worlddomination.Twitch
                             bool valid = true;
                             DateTime dateTimeNow = DateTime.Now;
                             TimeSpan repostTime = new TimeSpan(0, 0, 25, 0, 0); // 25 minutes is the minimum time between streams from the same channel & game
+                            if (   ids[0].Equals("Descent")
+                                || ids[0].Equals("Descent II")
+                                || ids[0].Equals("Descent 3")
+                                || ids[0].Equals("Descent Mission Builder"))
+                            {
+                                repostTime = new TimeSpan(0, 16, 0, 0, 0);
+                            }
                             if (repost_dict.ContainsKey(n_name[j])  )
                             {
                                 if (!(dateTimeNow.Subtract(repost_dict.GetValueOrDefault(n_name[j])).CompareTo(repostTime) > 0))
@@ -232,7 +241,7 @@ namespace Worlddomination.Twitch
                                         Imgur.Imgur imgur = new Imgur.Imgur();
                                         string finallink = imgur.GetImageUrl(fullPath);
 
-                                        string url = "https://www.twitch.tv/" + n_name[j];
+                                        string url = urls[j];//"https://www.twitch.tv/" + n_name[j];
 
                                         string game_name = ids[0];
                                         if (ids[0].Equals("491757")) game_name = "Overload"; // this might not be necessary anymore, test by adding a console.writeline

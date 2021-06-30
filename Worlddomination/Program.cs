@@ -3,13 +3,11 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Reflection;
 using System.Threading.Tasks;
 using TwitchLib.Api;
 using Worlddomination.Twitch;
 using System.Data.SQLite;
-using System.Linq;
-using System.Text;
+
 
 namespace Worlddomination
 {
@@ -26,7 +24,7 @@ namespace Worlddomination
 
         public static StreamsMonitorHandler smh;
 
-        public static string version = "0.8.6";
+        public static string version = "0.8.8";
 
         internal static CommandService commands;
         internal static IServiceProvider services;
@@ -54,7 +52,7 @@ namespace Worlddomination
             API.Settings.AccessToken = Data.APIToken.GetTwitchAccessToken();
 
             // Initialize the SQL Database here
-            Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " Database    initialised");
+            Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + " Database    initialized");
             sqlite_conn = CreateConnection();
             //CreateDefaultTables(sqlite_conn);
 
@@ -171,15 +169,6 @@ namespace Worlddomination
             sqlite_cmd = Program.sqlite_conn.CreateCommand();
             sqlite_cmd.CommandText = "INSERT INTO SampleTable(Col1, Col2) VALUES('Test Text ', 1); ";
             sqlite_cmd.ExecuteNonQuery();
-            sqlite_cmd.CommandText = "INSERT INTO SampleTable(Col1, Col2) VALUES('Hallo Ich ', 2); ";
-            sqlite_cmd.ExecuteNonQuery();
-            sqlite_cmd.CommandText = "INSERT INTO SampleTable(Col1, Col2) VALUES('Test2 Bin ', 3); ";
-            sqlite_cmd.ExecuteNonQuery();
-
-
-            sqlite_cmd.CommandText = "INSERT INTO SampleTable1(Col1, Col2) VALUES('Ein Baum ', 3); ";
-            sqlite_cmd.ExecuteNonQuery();
-
         }
 
         static void ReadData(SQLiteConnection conn)
