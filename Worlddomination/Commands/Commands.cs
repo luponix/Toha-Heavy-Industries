@@ -14,11 +14,10 @@ using TwitchLib.Api.Helix.Models.Users;
 
 namespace Worlddomination.Commands
 {
-    // Keep in mind your module **must** be public and inherit ModuleBase.
-    // If it isn't, it will not be discovered by AddModulesAsync!
+
     public class Commands : ModuleBase<SocketCommandContext>
     {
-        // public variables that should prbably be in program but whatever
+        // public variables that should probably be in program but whatever
         public static IReadOnlyCollection<SocketGuildUser> users;
 
        

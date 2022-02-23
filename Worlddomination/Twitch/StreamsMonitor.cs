@@ -34,13 +34,10 @@ namespace Worlddomination.Twitch
         private string server_out = "data";             // the discord server, this monitor should send too, 'data' = default value
 
 
-        //maybe create a class that unites these informations
         // holds returned data from the twitch api, need new and old data saved
         // to compare and circumvent some async madness
         TwitchLib.Api.Helix.Models.Streams.GetStreams.GetStreamsResponse veryOldActiveStreams;
-
         TwitchLib.Api.Helix.Models.Streams.GetStreams.GetStreamsResponse oldActiveStreams;
-
 
         // Datetime to figure out wether this stream should be posted, prevents unnecessary spam
         private Dictionary<string, DateTime> repost_dict = new Dictionary<string, DateTime>();
@@ -72,40 +69,15 @@ namespace Worlddomination.Twitch
                 limit = 20;
             }
             limit_of_streams = limit;
-            //streams_array = new TwitchLib.Api.V5.Models.Streams.Stream[limit];
-            //channel_names = new string[limit];
-            //profile_urls = new string[limit];
-            if (timer_time >= 60000) // we dont allow to request the api more than once per minute
-            {
-                timer_intervall = timer_time;
-            }
+
+            if (timer_time >= 60000) timer_intervall = timer_time;// we dont allow to request the api more than once per minute
             else
             {
                 Console.WriteLine("Monitor instantiation: didnt accept timer_time: value below 60000 : value= " + timer_time);
                 timer_intervall = 60000;
             }
         }
-        
-        public int GetIntervall() 
-        {
-            return timer_intervall;
-        }
-        public string GetGameID()
-        {
-            return game_id;
-        }
-        public int GetStreamLimit()
-        {
-            return limit_of_streams;
-        }
-        public string GetTargetServer()
-        {
-            return server_out;
-        }
-        public string GetTargetChannel()
-        {
-            return channel_out;
-        }
+
 
         //Timer section:
         public void Awake()
@@ -132,7 +104,6 @@ namespace Worlddomination.Twitch
             var activeStreams = Program.API.Helix.Streams.GetStreamsAsync(first: limit_of_streams, gameIds: ids).Result;
             if (activeStreams.Streams.Length == 0)
             {
-                Console.WriteLine(" no active streams: "+game_id);
                 if (!is_monitor_initialized)
                 {
                     Console.WriteLine("Populated Monitor with pulled data gameid: " + game_id);
@@ -245,14 +216,13 @@ namespace Worlddomination.Twitch
             Imgur.Imgur imgur = new Imgur.Imgur();
             string finallink = imgur.GetImageUrl(fullPath);
 
-            string url = "https://www.twitch.tv/" + user.Login;//stream.UserName;
+            string url = "https://www.twitch.tv/" + user.Login;
 
             
-            var user_videos2 = Program.API.Helix.Videos.GetVideoAsync(userId: stream.UserId, first: 1).Result; //Channels.GetChannelInformationAsync(stream.UserId).Result;
-            //var user_videos = Program.API.V5.Channels.GetChannelVideosAsync(n_streams[j].Channel.Id, limit: 1).Result;
+            var user_videos = Program.API.Helix.Videos.GetVideoAsync(userId: stream.UserId, first: 1).Result; 
             Discord.EmbedBuilder embed = new EmbedBuilder
             {
-                Title = stream.Title,//n_streams[j].Channel.Status,
+                Title = stream.Title,
                 ThumbnailUrl = user.ProfileImageUrl,
             };
             embed.AddField(user.DisplayName + " is streaming " + Format.Bold(stream_category), "under " + url);
@@ -261,7 +231,7 @@ namespace Worlddomination.Twitch
             embed.WithUrl(url);
             try
             {
-                if(!user_videos2.Videos[0].Id.Equals("null")) embed.AddField("This stream will be archived under ", "https://www.twitch.tv/videos/"+user_videos2.Videos[0].Id);//, user_videos2.Videos[0].);//user_videos.Videos[0].Url);
+                if(!user_videos.Videos[0].Id.Equals("null")) embed.AddField("This stream will be archived under ", "https://www.twitch.tv/videos/"+user_videos.Videos[0].Id);
             }
             catch (Exception e)
             {
@@ -274,22 +244,11 @@ namespace Worlddomination.Twitch
 
 
 
-
-
-
-
-
-
-
-
-
-
         public void PrintChannelNames(string server, string channel)
         {
             foreach(var stream in oldActiveStreams.Streams)
             {
                 Misc.SendMessageWithoutContext(stream.UserName, channel, server);
-
             }
         }
 

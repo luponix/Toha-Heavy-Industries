@@ -24,7 +24,7 @@ namespace Worlddomination
 
         public static StreamsMonitorHandler smh;
 
-        public static string version = "0.8.9";
+        public static string version = "0.9.0";
 
         internal static CommandService commands;
         internal static IServiceProvider services;
@@ -50,25 +50,6 @@ namespace Worlddomination
             API.Settings.ClientId = Data.APIToken.GetTwitchClientId();          
             API.Settings.Secret = Data.APIToken.GetTwitchClientSecret();           
             //API.Settings.AccessToken = Data.APIToken.GetTwitchAccessToken();
-
-
-
-            List<string> ids = new List<string>();
-            ids.Add("491757");
-            var request1 = Program.API.Helix.Streams.GetStreamsAsync(first: 25, gameIds: ids).Result;
-            int i = 0;
-            foreach (TwitchLib.Api.Helix.Models.Streams.GetStreams.Stream stream in request1.Streams)
-            {
-                Console.WriteLine(i + ":" + stream.UserName);
-                Console.WriteLine(stream.Id);
-                Console.WriteLine(stream.GameId);
-                Console.WriteLine(stream.GameName);
-                Console.WriteLine(stream.ThumbnailUrl);
-                Console.WriteLine(stream.Title);
-                Console.WriteLine("");
-                i++;
-            }
-
 
 
             // Initialize the SQL Database here

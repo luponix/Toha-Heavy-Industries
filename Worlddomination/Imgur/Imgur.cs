@@ -42,7 +42,7 @@ namespace Worlddomination.Imgur
             }
             catch (ImgurException imgurEx)
             {
-                Console.WriteLine("An error occurred uploading an image to Imgur.");
+                Console.WriteLine("An error occurred when uploading an image to Imgur.");
                 Console.WriteLine(imgurEx.Message);
                 return "";
             }
