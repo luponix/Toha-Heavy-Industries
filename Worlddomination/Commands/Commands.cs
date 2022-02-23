@@ -350,8 +350,30 @@ namespace Worlddomination.Commands
             }
         }
 
+        [Command("catid")]
+        [Summary("returns the gameid of category")]
+        public async Task GetCategoryId(string category)
+        {
+            if ((Context.Message.Author.Username + "#" + Context.Message.Author.Discriminator).Equals("luponix#5950")
+             || (Context.Message.Author.Username + "#" + Context.Message.Author.Discriminator).Equals("CHILLY_BUS#0001"))
+            {
+                List<string> userlog = new List<string>();
+               
 
-       
+
+                var result = await Program.API.Helix.Search.SearchCategoriesAsync(category, first: 1);    //Streams.GetStreamsAsync(userLogins: userlog);
+
+                string catid = result.Games[0].Name + " : " + result.Games[0].Id;
+                await Context.Channel.SendMessageAsync(catid);
+
+
+            }
+            else
+            {
+                await Context.Channel.SendMessageAsync("you are not the pathfinder main but if you want i can generate a minesweeper grid for you");
+            }
+        }
+
 
 
 

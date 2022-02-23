@@ -25,6 +25,7 @@ namespace Worlddomination.Imgur
                 catch(Exception e)
                 {
                     Console.WriteLine(DateTime.Now.ToString("HH:mm:ss") + "    [ERROR]   Download.DownloadUrl failed");
+                    //Console.WriteLine(url+" "+ imagename);
                     // download https://i.imgur.com/ftxM106.png instead if the exception actually gets thrown here
                     // if it doesnt we can also move this method into stream monitor
                     client.DownloadFile(new Uri("https://i.imgur.com/ftxM106.png"), imagename);
